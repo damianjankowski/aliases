@@ -39,8 +39,11 @@ cleanup_tokens() {
   local tokens=(
     GITHUB_TOKEN
     GITLAB_TOKEN
-    DYNATRACE_TOKEN
-    DYNATRACE_TENANT
+    DYNATRACE_CLIENT_ID
+    DYNATRACE_CLIENT_SECRET
+    DYNATRACE_API_TOKEN
+    DYNATRACE_AUTOMATION_CLIENT_ID
+    DYNATRACE_AUTOMATION_CLIENT_SECRET
   )
   
   for token in "${tokens[@]}"; do
@@ -129,6 +132,68 @@ gitlab_token_work() {
   gitlab_token "work" "$@"
 }
 
+# Dynatrace OAuth token management
+dynatrace_oauth_token() {
+  local action="$1"
+  
+  case "$action" in
+    set)
+      set_token "dynatrace-automation-client-id" "Enter Dynatrace Automation Client ID:"
+      set_token "dynatrace-automation-client-secret" "Enter Dynatrace Automation Client Secret:"
+      ;;
+    get)
+      get_token "dynatrace-automation-client-id" "DYNATRACE_CLIENT_ID"
+      get_token "dynatrace-automation-client-secret" "DYNATRACE_CLIENT_SECRET"
+      ;;
+    use)
+      get_token "dynatrace-automation-client-id" "DYNATRACE_CLIENT_ID"
+      get_token "dynatrace-automation-client-secret" "DYNATRACE_CLIENT_SECRET"
+      ;;
+    delete)
+      security delete-generic-password -a "$USER" -s "dynatrace-automation-client-id" 2>/dev/null
+      security delete-generic-password -a "$USER" -s "dynatrace-automation-client-secret" 2>/dev/null
+      if [ $? -eq 0 ]; then
+        echo "Dynatrace OAuth tokens deleted from Keychain"
+      else
+        echo "Error: Failed to delete Dynatrace OAuth tokens"
+        return 1
+      fi
+      ;;
+    *)
+      echo "Usage: dynatrace_oauth_token [set|get|use|delete]"
+      ;;
+  esac
+}
+
+# Dynatrace API token management
+dynatrace_api_token() {
+  local action="$1"
+  
+  case "$action" in
+    set)
+      set_token "dynatrace-api-token" "Enter Dynatrace API Token:"
+      ;;
+    get)
+      get_token "dynatrace-api-token" "DYNATRACE_API_TOKEN"
+      ;;
+    use)
+      get_token "dynatrace-api-token" "DYNATRACE_API_TOKEN"
+      ;;
+    delete)
+      security delete-generic-password -a "$USER" -s "dynatrace-api-token" 2>/dev/null
+      if [ $? -eq 0 ]; then
+        echo "Dynatrace API token deleted from Keychain"
+      else
+        echo "Error: Failed to delete Dynatrace API token"
+        return 1
+      fi
+      ;;
+    *)
+      echo "Usage: dynatrace_api_token [set|get|use|delete]"
+      ;;
+  esac
+}
+
 # ---- Aliases ----
 alias getgithubtoken='github_token get'
 alias setgithubtoken='github_token set'
@@ -144,5 +209,15 @@ alias getgitlabtokenwork='gitlab_token_work get'
 alias setgitlabtokenwork='gitlab_token_work set'
 alias usegitlabtokenwork='gitlab_token_work use'
 alias deletegitlabtokenwork='gitlab_token_work delete'
+
+alias getdynatraceoauthtoken='dynatrace_oauth_token get'
+alias setdynatraceoauthtoken='dynatrace_oauth_token set'
+alias usedynatraceoauthtoken='dynatrace_oauth_token use'
+alias deletedynatraceoauthtoken='dynatrace_oauth_token delete'
+
+alias getdynatraceapitoken='dynatrace_api_token get'
+alias setdynatraceapitoken='dynatrace_api_token set'
+alias usedynatraceapitoken='dynatrace_api_token use'
+alias deletedynatraceapitoken='dynatrace_api_token delete'
 
 alias cleantokens='cleanup_tokens'
