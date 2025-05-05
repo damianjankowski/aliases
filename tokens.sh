@@ -35,6 +35,50 @@ get_token() {
   echo "Token '$token_name' loaded into $env_var_name"
 }
 
+delete_token() {
+  local token_name="$1"
+  local keychain_name="${token_name}_token"
+  
+  security delete-generic-password -a "$USER" -s "$keychain_name" 2>/dev/null
+  if [ $? -eq 0 ]; then
+    echo "Token '$token_name' deleted from Keychain"
+  else
+    echo "Error: Failed to delete token '$token_name'"
+    return 1
+  fi
+}
+
+manage_token() {
+  local token_name="$1"
+  local action="$2"
+  local env_var_name="$3"
+  local prompt_message="$4"
+  
+  case "$action" in
+    set)
+      set_token "$token_name" "$prompt_message"
+      ;;
+    get)
+      echo "Are you sure you want to display the token in the terminal? (y/N)"
+      read confirm
+      if [[ $confirm =~ ^[Yy]$ ]]; then
+        security find-generic-password -a "$USER" -s "${token_name}_token" -w
+      else
+        echo "Token display cancelled"
+      fi
+      ;;
+    use)
+      get_token "$token_name" "$env_var_name"
+      ;;
+    delete)
+      delete_token "$token_name"
+      ;;
+    *)
+      echo "Usage: manage_token TOKEN_NAME [set|get|use|delete] [ENV_VAR_NAME] [PROMPT_MESSAGE]"
+      ;;
+  esac
+}
+
 cleanup_tokens() {
   local tokens=(
     GITHUB_TOKEN
@@ -57,167 +101,41 @@ cleanup_tokens() {
   echo "All token environment variables have been cleared"
 }
 
-# GitHub token management
-github_token() {
-  local action="$1"
-  local value="$2"
-  
-  case "$action" in
-    set)
-      set_token "github" "Enter GitHub token:"
-      ;;
-    get)
-      security find-generic-password -a "$USER" -s "github_token" -w
-      ;;
-    use)
-      get_token "github" "GITHUB_TOKEN"
-      ;;
-    delete)
-      security delete-generic-password -a "$USER" -s "github_token" 2>/dev/null
-      if [ $? -eq 0 ]; then
-        echo "GitHub token deleted from Keychain"
-      else
-        echo "Error: Failed to delete GitHub token"
-        return 1
-      fi
-      ;;
-    *)
-      echo "Usage: github_token [set|get|use|delete]"
-      ;;
-  esac
-}
-
-# GitLab token management 
-gitlab_token() {
-  local context="$1"
-  local action="$2"
-  
-  if [ -z "$context" ]; then
-    echo "Usage: gitlab_token CONTEXT [set|get|use|delete]"
-    echo "  CONTEXT - Token context (e.g., work, personal)"
-    return 1
-  fi
-  
-  case "$action" in
-    set)
-      set_token "gitlab_$context" "Enter GitLab token for $context:"
-      ;;
-    get)
-      security find-generic-password -a "$USER" -s "gitlab_${context}_token" -w
-      ;;
-    use)
-      get_token "gitlab_$context" "GITLAB_TOKEN"
-      ;;
-    delete)
-      security delete-generic-password -a "$USER" -s "gitlab_${context}_token" 2>/dev/null
-      if [ $? -eq 0 ]; then
-        echo "GitLab $context token deleted from Keychain"
-      else
-        echo "Error: Failed to delete GitLab $context token"
-        return 1
-      fi
-      ;;
-    *)
-      echo "Usage: gitlab_token $context [set|get|use|delete]"
-      ;;
-  esac
-}
-
-# Gitlab envs
-gitlab_token_priv() {
-  gitlab_token "priv" "$@"
-}
-
-gitlab_token_work() {
-  gitlab_token "work" "$@"
-}
-
-# Dynatrace OAuth token management
-dynatrace_oauth_token() {
-  local action="$1"
-  
-  case "$action" in
-    set)
-      set_token "dynatrace-automation-client-id" "Enter Dynatrace Automation Client ID:"
-      set_token "dynatrace-automation-client-secret" "Enter Dynatrace Automation Client Secret:"
-      ;;
-    get)
-      get_token "dynatrace-automation-client-id" "DYNATRACE_CLIENT_ID"
-      get_token "dynatrace-automation-client-secret" "DYNATRACE_CLIENT_SECRET"
-      ;;
-    use)
-      get_token "dynatrace-automation-client-id" "DYNATRACE_CLIENT_ID"
-      get_token "dynatrace-automation-client-secret" "DYNATRACE_CLIENT_SECRET"
-      ;;
-    delete)
-      security delete-generic-password -a "$USER" -s "dynatrace-automation-client-id" 2>/dev/null
-      security delete-generic-password -a "$USER" -s "dynatrace-automation-client-secret" 2>/dev/null
-      if [ $? -eq 0 ]; then
-        echo "Dynatrace OAuth tokens deleted from Keychain"
-      else
-        echo "Error: Failed to delete Dynatrace OAuth tokens"
-        return 1
-      fi
-      ;;
-    *)
-      echo "Usage: dynatrace_oauth_token [set|get|use|delete]"
-      ;;
-  esac
-}
-
-# Dynatrace API token management
-dynatrace_api_token() {
-  local action="$1"
-  
-  case "$action" in
-    set)
-      set_token "dynatrace-api-token" "Enter Dynatrace API Token:"
-      ;;
-    get)
-      get_token "dynatrace-api-token" "DYNATRACE_API_TOKEN"
-      ;;
-    use)
-      get_token "dynatrace-api-token" "DYNATRACE_API_TOKEN"
-      ;;
-    delete)
-      security delete-generic-password -a "$USER" -s "dynatrace-api-token" 2>/dev/null
-      if [ $? -eq 0 ]; then
-        echo "Dynatrace API token deleted from Keychain"
-      else
-        echo "Error: Failed to delete Dynatrace API token"
-        return 1
-      fi
-      ;;
-    *)
-      echo "Usage: dynatrace_api_token [set|get|use|delete]"
-      ;;
-  esac
-}
-
 # ---- Aliases ----
-alias getgithubtoken='github_token get'
-alias setgithubtoken='github_token set'
-alias usegithubtoken='github_token use'
-alias deletegithubtoken='github_token delete'
+# -- GITHUB --
+alias getgithubtoken='manage_token github get GITHUB_TOKEN'
+alias setgithubtoken='manage_token github set GITHUB_TOKEN "Enter GitHub token:"'
+alias usegithubtoken='manage_token github use GITHUB_TOKEN'
+alias deletegithubtoken='manage_token github delete'
 
-alias getgitlabtokenpriv='gitlab_token_priv get'
-alias setgitlabtokenpriv='gitlab_token_priv set'
-alias usegitlabtokenpriv='gitlab_token_priv use'
-alias deletegitlabtokenpriv='gitlab_token_priv delete'
+# -- GITLAB PRIV --
+alias getgitlabtokenpriv='manage_token gitlab_priv get GITLAB_TOKEN'
+alias setgitlabtokenpriv='manage_token gitlab_priv set GITLAB_TOKEN "Enter GitLab private token:"'
+alias usegitlabtokenpriv='manage_token gitlab_priv use GITLAB_TOKEN'
+alias deletegitlabtokenpriv='manage_token gitlab_priv delete'
 
-alias getgitlabtokenwork='gitlab_token_work get'
-alias setgitlabtokenwork='gitlab_token_work set'
-alias usegitlabtokenwork='gitlab_token_work use'
-alias deletegitlabtokenwork='gitlab_token_work delete'
+# -- GITLAB WORK --
+alias getgitlabtokenwork='manage_token gitlab_work get GITLAB_TOKEN'
+alias setgitlabtokenwork='manage_token gitlab_work set GITLAB_TOKEN "Enter GitLab work token:"'
+alias usegitlabtokenwork='manage_token gitlab_work use GITLAB_TOKEN'
+alias deletegitlabtokenwork='manage_token gitlab_work delete'
 
-alias getdynatraceoauthtoken='dynatrace_oauth_token get'
-alias setdynatraceoauthtoken='dynatrace_oauth_token set'
-alias usedynatraceoauthtoken='dynatrace_oauth_token use'
-alias deletedynatraceoauthtoken='dynatrace_oauth_token delete'
+# -- DYNATRACE OAUTH --
+alias getdynatraceoauthtoken='manage_token dynatrace-automation-client-id get DYNATRACE_CLIENT_ID && manage_token dynatrace-automation-client-secret get DYNATRACE_CLIENT_SECRET'
+alias setdynatraceoauthtoken='manage_token dynatrace-automation-client-id set DYNATRACE_CLIENT_ID "Enter Dynatrace Automation Client ID:" && manage_token dynatrace-automation-client-secret set DYNATRACE_CLIENT_SECRET "Enter Dynatrace Automation Client Secret:"'
+alias usedynatraceoauthtoken='manage_token dynatrace-automation-client-id use DYNATRACE_CLIENT_ID && manage_token dynatrace-automation-client-secret use DYNATRACE_CLIENT_SECRET'
+alias deletedynatraceoauthtoken='manage_token dynatrace-automation-client-id delete && manage_token dynatrace-automation-client-secret delete'
 
-alias getdynatraceapitoken='dynatrace_api_token get'
-alias setdynatraceapitoken='dynatrace_api_token set'
-alias usedynatraceapitoken='dynatrace_api_token use'
-alias deletedynatraceapitoken='dynatrace_api_token delete'
+# -- DYNATRACE API DEV --
+alias getdynatraceapitokendev='manage_token dynatrace-api-token get DYNATRACE_API_TOKEN'
+alias setdynatraceapitokendev='manage_token dynatrace-api-token set DYNATRACE_API_TOKEN "Enter Dynatrace API Token:"'
+alias usedynatraceapitokendev='manage_token dynatrace-api-token use DYNATRACE_API_TOKEN'
+alias deletedynatraceapitokendev='manage_token dynatrace-api-token delete'
+
+# -- DYNATRACE API PROD --
+alias getdynatraceapitokenprod='manage_token dynatrace-api-token-prod get DYNATRACE_API_TOKEN'
+alias setdynatraceapitokenprod='manage_token dynatrace-api-token-prod set DYNATRACE_API_TOKEN "Enter Dynatrace API Token:"'
+alias usedynatraceapitokenprod='manage_token dynatrace-api-token-prod use DYNATRACE_API_TOKEN'
+alias deletedynatraceapitokenprod='manage_token dynatrace-api-token-prod delete'
 
 alias cleantokens='cleanup_tokens'

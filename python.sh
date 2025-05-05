@@ -241,11 +241,8 @@ setup_precommit() {
     fi
 
     if ! command -v pre-commit >/dev/null 2>&1; then
-        echo "Installing pre-commit..."
-        if ! pip install pre-commit; then
-            echo "Error: Failed to install pre-commit"
-            return 1
-        fi
+        echo "Error: pre-commit is not installed. Please install it using: pip install pre-commit"
+        return 1
     fi
     
     if [ ! -f ".pre-commit-config.yaml" ]; then
@@ -462,18 +459,14 @@ create_poetry_project() {
     local user_input
     local venv_name
 
-    # Initialize git repository if not already initialized
     if [ ! -d ".git" ]; then
-        echo "Initializing git repository..."
         git init
         git add .
         git commit -m "Initial commit"
     fi
 
-    # Get project name from current directory
     project_name=$(get_current_dir_name)
 
-    # Ask for Python version
     if [ -z "$1" ]; then
         echo "Which Python version do you want to use? (Leave blank for latest)"
         read -r user_input
@@ -488,14 +481,12 @@ create_poetry_project() {
         python_version=$1
     fi
 
-    # Ensure Python version is installed
     if ! validate_python_version "$python_version"; then
         if ! pyenv_install "$python_version"; then
             return 1
         fi
     fi
 
-    # Create virtual environment with pyenv
     venv_name="${python_version}-${project_name}"
     echo "Creating virtual environment: $venv_name"
     if ! pyenv virtualenv -f "$python_version" "$venv_name"; then
@@ -503,11 +494,9 @@ create_poetry_project() {
         return 1
     fi
 
-    # Set local version for the project
     pyenv local "$venv_name"
     echo "Virtual environment '$venv_name' created and set as local version"
 
-    # Check if pipx is installed
     if ! command -v pipx >/dev/null 2>&1; then
         echo "Installing pipx..."
         if ! brew install pipx; then
@@ -519,7 +508,6 @@ create_poetry_project() {
         pipx ensurepath
     fi
 
-    # Check if poetry is installed via pipx
     if ! command -v poetry >/dev/null 2>&1; then
         echo "Installing poetry via pipx..."
         if ! pipx install poetry; then
@@ -528,22 +516,18 @@ create_poetry_project() {
         fi
     fi
 
-    # Configure poetry to use the pyenv virtual environment
     poetry config virtualenvs.create false
     poetry config virtualenvs.in-project false
 
-    # Initialize poetry project
     echo "Initializing poetry project: $project_name"
     if ! poetry init --name "$project_name" --description "A Python project" --author "$(git config user.name) <$(git config user.email)>" --python "^$python_version" --dependency "black" --dependency "isort" --dependency "ruff" --dependency "pytest" --dev-dependency "pre-commit" --no-interaction; then
         echo "Error: Failed to initialize poetry project"
         return 1
     fi
 
-    # Create basic project structure
     mkdir -p "$project_name" tests
     touch "$project_name/__init__.py" tests/__init__.py
 
-    # Create README.md
     cat > README.md << EOF
 # $project_name
 
@@ -569,7 +553,6 @@ poetry run pre-commit install
 - Run all checks: \`make check\`
 EOF
 
-    # Create pre-commit configuration
     cat > .pre-commit-config.yaml << EOF
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
@@ -605,17 +588,14 @@ repos:
         stages: [pre-commit]
 EOF
 
-    # Create Makefile
     create_poetry_makefile
 
-    # Install dependencies
     echo "Installing dependencies..."
     if ! poetry install; then
         echo "Error: Failed to install dependencies"
         return 1
     fi
 
-    # Setup pre-commit
     echo "Installing pre-commit hooks..."
     if ! poetry run pre-commit install; then
         echo "Error: Failed to install pre-commit hooks"
