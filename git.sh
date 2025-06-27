@@ -1,5 +1,5 @@
 #!/bin/bash
-# ---- Git aliases ----
+# ---- Aliases ----
 alias gp="git push"
 alias gca='git commit --amend'
 alias gcb='git checkout -b'

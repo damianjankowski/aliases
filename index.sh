@@ -29,6 +29,49 @@ display_aliases_from_file() {
   grep "^alias" "$file" 2>/dev/null | sed 's/alias //;s/=/ → /'
 }
 
+display_categorized_aliases() {
+  local file="$1"
+  local title="$2"
+  
+  echo -e "\n$title"
+  echo "---------------------"
+  
+  local current_section=""
+  local in_aliases_section=false
+  
+  while IFS= read -r line; do
+    if [[ "$line" == "# ---- Aliases ----" ]]; then
+      in_aliases_section=true
+      continue
+    fi
+    
+    if [ "$in_aliases_section" = false ]; then
+      continue
+    fi
+    
+    if [[ "$line" =~ ^#\ [A-Z] ]]; then
+      if [ -n "$current_section" ]; then
+        echo ""
+      fi
+      current_section="${line#\# }"
+      echo -e "\n$current_section"
+      continue
+    fi
+    
+    if [[ "$line" =~ ^alias ]]; then
+      alias_name="${line#alias }"
+      alias_name="${alias_name%%=*}"
+      alias_cmd="${line#*=}"
+      
+      alias_cmd="${alias_cmd#\'}"
+      alias_cmd="${alias_cmd%\'}"
+      
+      echo "  $alias_name → $alias_cmd"
+    fi
+  done < "$file"
+  echo ""
+}
+
 # ---- Aliases management functions ----
 alias_edit() {
   if [ -z "$ALIAS_EDITOR" ]; then
@@ -72,7 +115,11 @@ alias_list() {
     for file in "$ALIASES_DIR"/*.sh; do
       if [ -f "$file" ] && [ "$file" != "$ALIASES_DIR/index.sh" ]; then
         category=$(basename "$file" .sh)
-        display_aliases_from_file "$file" "Category: $category"
+        if grep -q "^# ---- Aliases ----" "$file" && grep -q "^# [A-Z]" "$file"; then
+          display_categorized_aliases "$file" "Category: $category (with categories)"
+        else
+          display_aliases_from_file "$file" "Category: $category"
+        fi
       fi
     done
     return 0
@@ -84,7 +131,11 @@ alias_list() {
   fi
   
   if [ -f "$ALIASES_DIR/$1.sh" ]; then
-    display_aliases_from_file "$ALIASES_DIR/$1.sh" "Aliases for category $1"
+    if grep -q "^# ---- Aliases ----" "$ALIASES_DIR/$1.sh" && grep -q "^# [A-Z]" "$ALIASES_DIR/$1.sh"; then
+      display_categorized_aliases "$ALIASES_DIR/$1.sh" "Aliases for category $1 (with categories)"
+    else
+      display_aliases_from_file "$ALIASES_DIR/$1.sh" "Aliases for category $1"
+    fi
   else
     echo "Error: Category '$1' not found"
     return 1
@@ -94,7 +145,7 @@ alias_list() {
 # ---- Initialize aliases ----
 load_aliases
 
-# ---- Aliases for alias management ----
+# ---- Aliases ----
 alias aedit="alias_edit"
 alias areload="alias_reload"
 alias alsc="alias_list_categories"

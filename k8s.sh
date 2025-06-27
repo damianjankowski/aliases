@@ -1,5 +1,5 @@
 #!/bin/bash
-# ---- Kubernetes aliases ----
+# ---- Aliases ----
 alias k="kubectl"
 alias kgp="kubectl get pods"
 alias kgs="kubectl get services"

@@ -1,4 +1,9 @@
 #!/bin/bash
-# ---- Utils aliases ----
+# ---- Aliases ----
+
+# APPS
 alias warp="open -a /Applications/Warp.app/ ."
+alias pycharm="open -a /Applications/Pycharm.app/ ."
+
+# Configs
 alias zshconfig="code $HOME/.zshrc"

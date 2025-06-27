@@ -1,5 +1,5 @@
 #!/bin/bash
-# ---- Terraform aliases ----
+# ---- Aliases ----
 alias tf="terraform"
 alias tfinit="terraform init"
 alias tfplan="terraform plan"
@@ -12,7 +12,7 @@ alias tfimport="terraform import"
 alias tfplanf="terraform plan -input=false"                                 # Generates a plan without user input
 alias tfapplyf="terraform apply -auto-approve"                              # Automatically applies the plan without approval
 
-alias tfclean="rm -rf .terraform/ && terraform init"                        # Removes local state files and reinitializes the directory
+alias tfclean="rm -rf .terraform .terraform.lock.hcl && terraform init"     # Removes local state files and reinitializes the directory
 
 alias tfstate="terraform state list"                                        # Lists all resources managed by Terraform in the state
 alias tfcheck="terraform fmt -recursive && terraform validate"              # Formats and validates all configuration files recursively

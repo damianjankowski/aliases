@@ -1,5 +1,5 @@
 #!/bin/bash
-# ---- Docker aliases ----
+# ---- Aliases ----
 alias dps="docker ps"
 alias dpa="docker ps -a"
 alias drun="docker run -it"

@@ -1,4 +1,8 @@
 #!/bin/bash
+if [[ "$(uname)" != "Darwin" ]]; then
+    return
+fi
+
 # ---- Token aliases  ----
 
 set_token() {
@@ -94,45 +98,41 @@ cleanup_tokens() {
     unset "$token"
   done
   
-  for var in $(env | grep -E "^GITLAB_.*_TOKEN=" | cut -d= -f1); do
-    unset "$var"
-  done
-  
   echo "All token environment variables have been cleared"
 }
 
 # ---- Aliases ----
-# -- GITHUB --
+# GITHUB
 alias getgithubtoken='manage_token github get GITHUB_TOKEN'
 alias setgithubtoken='manage_token github set GITHUB_TOKEN "Enter GitHub token:"'
 alias usegithubtoken='manage_token github use GITHUB_TOKEN'
 alias deletegithubtoken='manage_token github delete'
 
-# -- GITLAB PRIV --
+# GITLAB PRIV
 alias getgitlabtokenpriv='manage_token gitlab_priv get GITLAB_TOKEN'
 alias setgitlabtokenpriv='manage_token gitlab_priv set GITLAB_TOKEN "Enter GitLab private token:"'
 alias usegitlabtokenpriv='manage_token gitlab_priv use GITLAB_TOKEN'
 alias deletegitlabtokenpriv='manage_token gitlab_priv delete'
 
-# -- GITLAB WORK --
+# GITLAB WORK
 alias getgitlabtokenwork='manage_token gitlab_work get GITLAB_TOKEN'
 alias setgitlabtokenwork='manage_token gitlab_work set GITLAB_TOKEN "Enter GitLab work token:"'
 alias usegitlabtokenwork='manage_token gitlab_work use GITLAB_TOKEN'
 alias deletegitlabtokenwork='manage_token gitlab_work delete'
 
-# -- DYNATRACE OAUTH --
+# DYNATRACE OAUTH
 alias getdynatraceoauthtoken='manage_token dynatrace-automation-client-id get DYNATRACE_CLIENT_ID && manage_token dynatrace-automation-client-secret get DYNATRACE_CLIENT_SECRET'
 alias setdynatraceoauthtoken='manage_token dynatrace-automation-client-id set DYNATRACE_CLIENT_ID "Enter Dynatrace Automation Client ID:" && manage_token dynatrace-automation-client-secret set DYNATRACE_CLIENT_SECRET "Enter Dynatrace Automation Client Secret:"'
 alias usedynatraceoauthtoken='manage_token dynatrace-automation-client-id use DYNATRACE_CLIENT_ID && manage_token dynatrace-automation-client-secret use DYNATRACE_CLIENT_SECRET'
 alias deletedynatraceoauthtoken='manage_token dynatrace-automation-client-id delete && manage_token dynatrace-automation-client-secret delete'
 
-# -- DYNATRACE API DEV --
+# DYNATRACE API DEV
 alias getdynatraceapitokendev='manage_token dynatrace-api-token get DYNATRACE_API_TOKEN'
 alias setdynatraceapitokendev='manage_token dynatrace-api-token set DYNATRACE_API_TOKEN "Enter Dynatrace API Token:"'
 alias usedynatraceapitokendev='manage_token dynatrace-api-token use DYNATRACE_API_TOKEN'
 alias deletedynatraceapitokendev='manage_token dynatrace-api-token delete'
 
-# -- DYNATRACE API PROD --
+# DYNATRACE API PROD
 alias getdynatraceapitokenprod='manage_token dynatrace-api-token-prod get DYNATRACE_API_TOKEN'
 alias setdynatraceapitokenprod='manage_token dynatrace-api-token-prod set DYNATRACE_API_TOKEN "Enter Dynatrace API Token:"'
 alias usedynatraceapitokenprod='manage_token dynatrace-api-token-prod use DYNATRACE_API_TOKEN'
