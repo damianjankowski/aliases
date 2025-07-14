@@ -1,13 +1,15 @@
 #!/bin/bash
 # ---- Aliases ----
-alias tf="terraform"
-alias tfinit="terraform init"
-alias tfplan="terraform plan"
-alias tfapply="terraform apply"
-alias tfvalidate="terraform validate"
-alias tffmt="terraform fmt"
-alias tfdestroy="terraform destroy"
-alias tfimport="terraform import"
+alias tfi="terraform init"
+alias tfp="terraform plan"
+alias tfa="terraform apply"
+alias tfd="terraform destroy"
+alias tfv="terraform validate"
+alias tff="terraform fmt"
+alias tfo="terraform output"
+alias tfs="terraform state list"
+alias tfx="terraform state rm"
+alias tfimp="terraform import"
 
 alias tfplanf="terraform plan -input=false"                                 # Generates a plan without user input
 alias tfapplyf="terraform apply -auto-approve"                              # Automatically applies the plan without approval
@@ -30,4 +32,4 @@ alias tfdrift="terraform plan -detailed-exitcode"                           # Re
 
 alias tfapplyplan="terraform plan -out=tfplan && terraform apply tfplan"    # Creates a plan and immediately applies it
 
-alias tfgraph="terraform graph | dot -Tsvg > graph.svg"                     # Creates a dependency graph and saves it as an SVG file
+alias tfgraph="terraform graph | dot -Tsvg -o graph.svg"                     # Creates a dependency graph and saves it as an SVG file

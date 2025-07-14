@@ -42,5 +42,5 @@ brew_maintenance() {
 }
 
 # ---- Aliases ----
-alias fullbrew="brew_maintenance"
+alias brewmaint="brew_maintenance"
 alias brewcleanuninstall='brew_clean_uninstall "$@"'
