@@ -7,3 +7,5 @@ alias pycharm="open -a /Applications/Pycharm.app/ ."
 
 # Configs
 alias zshconfig="code $HOME/.zshrc"
+
+alias ls="eza --icons"

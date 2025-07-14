@@ -12,4 +12,4 @@ alias kex="kubectl exec -it"
 alias kns="kubectl config set-context --current --namespace"
 alias krestart="kubectl rollout restart deployment"
 alias kdelpods="kubectl delete pod"
-alias klog='kubectl logs -f'        
+alias klog='kubectl logs -f'

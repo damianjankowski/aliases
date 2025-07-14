@@ -42,8 +42,5 @@ brew_maintenance() {
 }
 
 # ---- Aliases ----
-alias brewup="brew update && brew outdated"
-alias brewupg="brew upgrade && brew cleanup"
 alias fullbrew="brew_maintenance"
 alias brewcleanuninstall='brew_clean_uninstall "$@"'
-alias brewmaint="brew_maintenance"
