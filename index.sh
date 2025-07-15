@@ -3,7 +3,7 @@
 
 # Configuration
 ALIASES_DIR="$HOME/src/infrastucture/bare-metal/aliases"
-ALIAS_EDITOR="code"
+ALIAS_EDITOR="cursor"
 
 # ---- Load all alias files ----
 load_aliases() {

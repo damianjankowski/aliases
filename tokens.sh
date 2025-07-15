@@ -127,6 +127,18 @@ alias setdynatraceoauthtoken='manage_token dynatrace-automation-client-id set DY
 alias usedynatraceoauthtoken='manage_token dynatrace-automation-client-id use DYNATRACE_CLIENT_ID && manage_token dynatrace-automation-client-secret use DYNATRACE_CLIENT_SECRET && manage_token dynatrace-automation-dynatrace-account use DYNATRACE_ACCOUNT_ID'
 alias deletedynatraceoauthtoken='manage_token dynatrace-automation-client-id delete && manage_token dynatrace-automation-client-secret delete && manage_token dynatrace-automation-dynatrace-account delete'
 
+# DYNATRACE URL PROD
+alias getdynatraceurlprod='manage_token dynatrace-url-prod get DYNATRACE_URL_PROD'
+alias setdynatraceurlprod='manage_token dynatrace-url-prod set DYNATRACE_URL_PROD "Enter Dynatrace URL:"'
+alias usedynatraceurlprod='manage_token dynatrace-url-prod use DYNATRACE_URL_PROD'
+alias deletedynatraceurlprod='manage_token dynatrace-url-prod delete'
+
+# DYNATRACE URL DEV
+alias getdynatraceurldev='manage_token dynatrace-url-dev get DYNATRACE_URL_DEV'
+alias setdynatraceurldev='manage_token dynatrace-url-dev set DYNATRACE_URL_DEV "Enter Dynatrace URL:"'
+alias usedynatraceurldev='manage_token dynatrace-url-dev use DYNATRACE_URL_DEV'
+alias deletedynatraceurldev='manage_token dynatrace-url-dev delete'
+
 # DYNATRACE API DEV
 alias getdynatraceapitokendev='manage_token dynatrace-api-token get DYNATRACE_API_TOKEN'
 alias setdynatraceapitokendev='manage_token dynatrace-api-token set DYNATRACE_API_TOKEN "Enter Dynatrace API Token:"'
