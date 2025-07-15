@@ -150,3 +150,8 @@ alias aedit="alias_edit"
 alias areload="alias_reload"
 alias alsc="alias_list_categories"
 alias als="alias_list"
+alias zshconfig="  $ALIAS_EDITOR  $HOME/.zshrc"
+
+# APPS
+alias warp="open -a /Applications/Warp.app/ ."
+alias pycharm="open -a /Applications/Pycharm.app/ ."
