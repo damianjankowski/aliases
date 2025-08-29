@@ -140,4 +140,10 @@ alias setdynatraceapitokenprod='manage_token dynatrace-api-token-prod set DYNATR
 alias usedynatraceapitokenprod='manage_token dynatrace-api-token-prod use DYNATRACE_API_TOKEN'
 alias deletedynatraceapitokenprod='manage_token dynatrace-api-token-prod delete'
 
+# PAGER DUTY
+alias getpagerduty='manage_token pagerduty get PAGERDUTY_TOKEN'
+alias setpagerduty='manage_token pagerduty set PAGERDUTY_TOKEN "Enter PagerDuty work token:"'
+alias usepagerduty='manage_token pagerduty use PAGERDUTY_TOKEN'
+alias deletepagerduty='manage_token pagerduty delete'
+
 alias cleantokens='cleanup_tokens'
