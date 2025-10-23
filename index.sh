@@ -19,8 +19,10 @@ display_aliases_from_file() {
   local title="$2"
 
   printf "\n%s\n" "$title"
-  printf "---------------------\n"
-  grep "^alias" "$file" 2>/dev/null | sed 's/alias //;s/=/ → /'
+  printf "%s\n" "---------------------"
+  grep "^alias" "$file" 2>/dev/null | sed 's/alias //;s/=/ → /' | while IFS=' → ' read -r alias_name alias_cmd; do
+    printf "  %-12s → %s\n" "$alias_name" "$alias_cmd"
+  done
 }
 
 display_categorized_aliases() {
@@ -28,7 +30,7 @@ display_categorized_aliases() {
   local title="$2"
 
   printf "\n%s\n" "$title"
-  printf "---------------------\n"
+  printf "%s\n" "---------------------"
 
   local current_section=""
   local in_aliases_section=false
@@ -54,13 +56,12 @@ display_categorized_aliases() {
     fi
 
     if [[ "$line" =~ ^alias ]]; then
-      local alias_name alias_cmd
-      alias_name="${line#alias }"
+      local alias_name="${line#alias }"
       alias_name="${alias_name%%=*}"
-      alias_cmd="${line#*=}"
+      local alias_cmd="${line#*=}"
       alias_cmd="${alias_cmd#\'}"
       alias_cmd="${alias_cmd%\'}"
-      printf "  %s → %s\n" "$alias_name" "$alias_cmd"
+      printf "  %-12s → %s\n" "$alias_name" "$alias_cmd"
     fi
   done < "$file"
   printf "\n"
